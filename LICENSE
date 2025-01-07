@@ -1,13 +1,6 @@
-# License for package patches
-
-The scripts and patches to build each package is licensed under the same
-license as the actual package (so the patches and scripts to build bash are
-licensed under the same license as bash, while the patches and scripts to build
-python are licensed under the same license as python).
-
 MIT License
 
-Copyright (c) 2025-2004 Billal Mesloub
+Copyright (c) 2025-2004  وحدة الهندسة وهندسة البرماجيات-Billal Mesloub
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
