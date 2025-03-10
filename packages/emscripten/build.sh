@@ -2,7 +2,7 @@ TERMUX_PKG_HOMEPAGE=https://emscripten.org
 TERMUX_PKG_DESCRIPTION="Emscripten: An LLVM-to-WebAssembly Compiler"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="3.1.74"
+TERMUX_PKG_VERSION="4.0.4"
 TERMUX_PKG_SRCURL=git+https://github.com/emscripten-core/emscripten
 TERMUX_PKG_GIT_BRANCH=${TERMUX_PKG_VERSION}
 TERMUX_PKG_DEPENDS="nodejs-lts | nodejs, python"
@@ -45,6 +45,7 @@ opt/emscripten-llvm/bin/llvm-mca
 opt/emscripten-llvm/bin/llvm-ml
 opt/emscripten-llvm/bin/llvm-pdbutil
 opt/emscripten-llvm/bin/llvm-profdata
+opt/emscripten-llvm/bin/llvm-profgen
 opt/emscripten-llvm/bin/llvm-rc
 opt/emscripten-llvm/bin/nvptx-arch
 opt/emscripten-llvm/lib/libclang.so*
@@ -54,13 +55,13 @@ opt/emscripten/LICENSE
 
 # https://github.com/emscripten-core/emscripten/issues/11362
 # can switch to stable LLVM to save space once above is fixed
-_LLVM_COMMIT=322eb1a92e6d4266184060346616fa0dbe39e731
-_LLVM_TGZ_SHA256=528b7a7324343a3241ec211c5fb2c3c0fa56208107969f7deb4e9462bccd25a4
+_LLVM_COMMIT=148111fdcf0e807fe74274b18fcf65c4cff45d63
+_LLVM_TGZ_SHA256=84dae4c261a4b1e277d94977c9f929f8d51b252de3f1002099bd0fc4e07c20b9
 
 # https://github.com/emscripten-core/emscripten/issues/12252
 # upstream says better bundle the right binaryen revision for now
-_BINARYEN_COMMIT=52bc45fc34ec6868400216074744147e9d922685
-_BINARYEN_TGZ_SHA256=a1ade0b4203a4b96df18cad55a724e006603977ad11bcb84cfd79b2f2d92c76c
+_BINARYEN_COMMIT=5f767b73d8dc846db532decc64109d3aab63873c
+_BINARYEN_TGZ_SHA256=3d8811bd49cc2d91b8e5b04da98e138f6705694fa64ac935be263525a3ad5106
 
 # https://github.com/emscripten-core/emsdk/blob/main/emsdk.py
 # https://chromium.googlesource.com/emscripten-releases/+/refs/heads/main/src/build.py
@@ -171,7 +172,9 @@ termux_step_post_get_source() {
 		"https://github.com/WebAssembly/binaryen/archive/${_BINARYEN_COMMIT}.tar.gz" \
 		"${TERMUX_PKG_CACHEDIR}/binaryen.tar.gz" \
 		"${_BINARYEN_TGZ_SHA256}"
+	rm -rf "${TERMUX_PKG_CACHEDIR}/llvm-project-${_LLVM_COMMIT}"
 	tar -xf "${TERMUX_PKG_CACHEDIR}/llvm.tar.gz" -C "${TERMUX_PKG_CACHEDIR}"
+	rm -rf "${TERMUX_PKG_CACHEDIR}/binaryen-${_BINARYEN_COMMIT}"
 	tar -xf "${TERMUX_PKG_CACHEDIR}/binaryen.tar.gz" -C "${TERMUX_PKG_CACHEDIR}"
 
 	local llvm_patches=$(find "${TERMUX_PKG_BUILDER_DIR}" -mindepth 1 -maxdepth 1 -type f -name 'llvm-project-*.diff')

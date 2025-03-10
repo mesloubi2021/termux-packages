@@ -2,11 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://golang.org/
 TERMUX_PKG_DESCRIPTION="Go programming language compiler"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux"
-_MAJOR_VERSION=1.23
-# Use the ~ deb versioning construct in the future:
-TERMUX_PKG_VERSION=3:${_MAJOR_VERSION}.2
+TERMUX_PKG_VERSION="3:1.24.1"
 TERMUX_PKG_SRCURL=https://storage.googleapis.com/golang/go${TERMUX_PKG_VERSION#*:}.src.tar.gz
-TERMUX_PKG_SHA256=36930162a93df417d90bd22c6e14daff4705baac2b02418edda671cdfa9cd07f
+TERMUX_PKG_SHA256=8244ebf46c65607db10222b5806aeb31c1fcf8979c1b6b12f60c677e9a3c0656
 TERMUX_PKG_DEPENDS="clang"
 TERMUX_PKG_ANTI_BUILD_DEPENDS="clang"
 TERMUX_PKG_RECOMMENDS="resolv-conf"
@@ -53,8 +51,7 @@ termux_step_make_install() {
 	cp pkg/include/* $TERMUX_GODIR/pkg/include/
 	cp -Rf lib/* $TERMUX_GODIR/lib
 	cp -Rf misc/ $TERMUX_GODIR/
-}
 
-termux_step_post_massage() {
-	find . -path '*/testdata*' -delete
+	# testdata directories are not needed on the installed system
+	find $TERMUX_GODIR/src -path '*/testdata*' -delete
 }

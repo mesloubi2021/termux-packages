@@ -37,6 +37,8 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 1000
+    - name: Set process id limit for 32-bit builds depending on aosp-libs
+      run: echo 65535 | sudo tee /proc/sys/kernel/pid_max
     - name: Gather build summary
       id: build-info
       env:
@@ -228,9 +230,9 @@ jobs:
         done
 
         if [ "$DOCKER_BUILD" == 'false' ]; then
-          NDK=$ANDROID_NDK ANDROID_HOME=$ANDROID_SDK_ROOT ./build-package.sh -I -a ${{ matrix.target_arch }} $packages
+          NDK=$ANDROID_NDK ANDROID_HOME=$ANDROID_SDK_ROOT ./build-package.sh -I -C -a ${{ matrix.target_arch }} $packages
         elif [ -n "$packages" ]; then
-          ./scripts/run-docker.sh ./build-package.sh -I -a ${{ matrix.target_arch }} $packages
+          ./scripts/run-docker.sh ./build-package.sh -I -C -a ${{ matrix.target_arch }} $packages
         fi
 
     - name: Generate build artifacts
@@ -273,6 +275,32 @@ jobs:
       with:
         name: debs-${{ matrix.target_arch }}-${{ github.sha }}
         path: ./artifacts
+
+  test-buildorder-random:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v4
+    - name: Randomise buildorder.py test
+      run: ./scripts/bin/test-buildorder-random
+    - name: Randomise buildorder.py test (aarch64)
+      env:
+        TERMUX_ARCH: aarch64
+      run: ./scripts/bin/test-buildorder-random
+    - name: Randomise buildorder.py test (arm)
+      env:
+        TERMUX_ARCH: arm
+      run: ./scripts/bin/test-buildorder-random
+    - name: Randomise buildorder.py test (i686)
+      env:
+        TERMUX_ARCH: i686
+      run: ./scripts/bin/test-buildorder-random
+    - name: Randomise buildorder.py test (x86_64)
+      env:
+        TERMUX_ARCH: x86_64
+      run: ./scripts/bin/test-buildorder-random
 
   upload-test:
     permissions:
@@ -329,16 +357,16 @@ jobs:
             fi
             result=$(find debs -maxdepth 1 -type f | cut -d"/" -f2 | xargs -P$(nproc) -i{} grep "^Filename:.*/{}$" -nH "Packages-${repo}-${arch}" || true)
             if [ -n "$result" ]; then
-              if [ "$error" = 0 ]; then
-                echo "[!] Found local files same name with server files!"
-                echo "[!] Please revbump package, rebase or tag commit with '%ci:no-build'"
-              fi
               echo "$result" | grep -E "${arch}|all" || true
               error=1
             fi
           done
         done
-        if [ "$error" != 0 ]; then exit 1; fi
+        if [ "$error" != 0 ]; then
+          echo "[!] Found local files same name with server files!"
+          echo "[!] Please revbump package, rebase or tag commit with '%ci:no-build'"
+          exit 1
+        fi
 
   upload:
     concurrency: ${{ github.workflow }}

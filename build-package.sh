@@ -88,6 +88,10 @@ source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_pkg_config_wrapper.sh
 # shellcheck source=scripts/build/setup/termux_setup_crystal.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_crystal.sh"
 
+# Utility function for setting up DotNet toolchain.
+# shellcheck source=scripts/build/setup/termux_setup_dotnet.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_dotnet.sh"
+
 # Utility function for setting up Flang toolchain.
 # shellcheck source=scripts/build/setup/termux_setup_flang.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/setup/termux_setup_flang.sh"
@@ -204,6 +208,10 @@ source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_setup_build_folders.sh"
 # Source the package build script and start building. Not to be overridden by packages.
 # shellcheck source=scripts/build/termux_step_start_build.sh
 source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_start_build.sh"
+
+# Cleans up files from already built packages. Not to be overridden by packages.
+# shellcheck source=scripts/build/termux_step_start_build.sh
+source "$TERMUX_SCRIPTDIR/scripts/build/termux_step_cleanup_packages.sh"
 
 # Download or build dependencies. Not to be overridden by packages.
 # shellcheck source=scripts/build/termux_step_create_timestamp_file.sh
@@ -415,6 +423,8 @@ _show_usage() {
 	echo "Available options:"
 	[ "$TERMUX_ON_DEVICE_BUILD" = "false" ] && echo "  -a The architecture to build for: aarch64(default), arm, i686, x86_64 or all."
 	echo "  -d Build with debug symbols."
+	echo "  -c Continue building."
+	echo "  -C Cleanup already built packages on low disk space."
 	echo "  -D Build a disabled package in disabled-packages/."
 	echo "  -f Force build even if package has already been built."
 	echo "  -F Force build even if package and its dependencies have already been built."
@@ -422,6 +432,7 @@ _show_usage() {
 	echo "  -I Download and extract dependencies instead of building them, keep existing $TERMUX_BASE_DIR files."
 	echo "  -L The package and its dependencies will be based on the same library."
 	echo "  -q Quiet build."
+	echo "  -Q Loud build -- set -x debug output."
 	echo "  -w Install dependencies without version binding."
 	echo "  -s Skip dependency check."
 	echo "  -o Specify directory where to put built packages. Default: output/."
@@ -497,6 +508,7 @@ while (($# >= 1)); do
 			;;
 		-L) export TERMUX_GLOBAL_LIBRARY=true;;
 		-q) export TERMUX_QUIET_BUILD=true;;
+		-Q) set -x;;
 		-w) export TERMUX_WITHOUT_DEPVERSION_BINDING=true;;
 		-s) export TERMUX_SKIP_DEPCHECK=true;;
 		-o)
@@ -511,6 +523,7 @@ while (($# >= 1)); do
 			fi
 			;;
 		-c) TERMUX_CONTINUE_BUILD=true;;
+		-C) TERMUX_CLEANUP_BUILT_PACKAGES_ON_LOW_DISK_SPACE=true;;
 		-*) termux_error_exit "./build-package.sh: illegal option '$1'";;
 		*) PACKAGE_LIST+=("$1");;
 	esac
@@ -578,7 +591,7 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 					${TERMUX_FORCE_BUILD+-f} ${TERMUX_INSTALL_DEPS+-i} ${TERMUX_IS_DISABLED+-D} \
 					${TERMUX_DEBUG_BUILD+-d} ${TERMUX_OUTPUT_DIR+-o $TERMUX_OUTPUT_DIR} \
 					${TERMUX_FORCE_BUILD_DEPENDENCIES+-F} ${TERMUX_GLOBAL_LIBRARY+-L} \
-					${TERMUX_WITHOUT_DEPVERSION_BINDING+-w} \
+					${TERMUX_WITHOUT_DEPVERSION_BINDING+-w} ${TERMUX_CLEANUP_BUILT_PACKAGES_ON_LOW_DISK_SPACE+-C} \
 					--format ${TERMUX_PACKAGE_FORMAT:=debian} \
 					--library ${TERMUX_PACKAGE_LIBRARY:=bionic} "${PACKAGE_LIST[i]}"
 			done
@@ -619,6 +632,7 @@ for ((i=0; i<${#PACKAGE_LIST[@]}; i++)); do
 			termux_step_setup_build_folders
 		fi
 
+		termux_step_cleanup_packages
 		termux_step_start_build
 
 		if ! termux_check_package_in_building_packages_list "${TERMUX_PKG_BUILDER_DIR#${TERMUX_SCRIPTDIR}/}"; then

@@ -82,7 +82,9 @@ termux_setup_toolchain_23c() {
 	fi
 
 	export CXXFLAGS="$CFLAGS"
-	export CPPFLAGS+=" -I${TERMUX_PREFIX}/include"
+	# set the proper header include order - first package includes, then prefix includes
+	# -isystem${TERMUX_PREFIX}/include/c++/v1 is needed here for on-device building to work correctly
+	export CPPFLAGS+=" -isystem${TERMUX_PREFIX}/include/c++/v1 -isystem${TERMUX_PREFIX}/include"
 
 	# If libandroid-support is declared as a dependency, link to it explicitly:
 	if [ "$TERMUX_PKG_DEPENDS" != "${TERMUX_PKG_DEPENDS/libandroid-support/}" ]; then
@@ -92,7 +94,7 @@ termux_setup_toolchain_23c() {
 	export GOOS=android
 	export CGO_ENABLED=1
 	export GO_LDFLAGS="-extldflags=-pie"
-	export CGO_CFLAGS="-I$TERMUX_PREFIX/include"
+	export CGO_CFLAGS="-isystem$TERMUX_PREFIX/include"
 
 	export CARGO_TARGET_NAME="${TERMUX_ARCH}-linux-android"
 	if [[ "${TERMUX_ARCH}" == "arm" ]]; then
@@ -102,6 +104,11 @@ termux_setup_toolchain_23c() {
 	export CARGO_TARGET_${env_host@U}_LINKER="${CC}"
 	export CARGO_TARGET_${env_host@U}_RUSTFLAGS="-L${TERMUX_PREFIX}/lib -C link-arg=-Wl,-rpath=${TERMUX_PREFIX}/lib -C link-arg=-Wl,--enable-new-dtags"
 	export CFLAGS_${env_host}="${CPPFLAGS} ${CFLAGS}"
+	export CC_x86_64_unknown_linux_gnu="gcc"
+	export CFLAGS_x86_64_unknown_linux_gnu="-O2"
+	export PKG_CONFIG_x86_64_unknown_linux_gnu="/usr/bin/pkg-config"
+	export PKG_CONFIG_LIBDIR_x86_64_unknown_linux_gnu="/usr/lib/pkgconfig"
+	export RUST_BACKTRACE="full"
 
 	export ac_cv_func_getpwent=no
 	export ac_cv_func_endpwent=yes

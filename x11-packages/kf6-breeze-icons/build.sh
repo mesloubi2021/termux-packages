@@ -2,9 +2,10 @@ TERMUX_PKG_HOMEPAGE='https://community.kde.org/Frameworks'
 TERMUX_PKG_DESCRIPTION='Breeze icon theme'
 TERMUX_PKG_LICENSE="GPL-3.0, LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.9.0"
+TERMUX_PKG_VERSION="6.11.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.kde.org/stable/frameworks/${TERMUX_PKG_VERSION%.*}/breeze-icons-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=618f633bafb0a5aabaa93eaa6733dfebd6e79303ef1d0a93dcf249181896bed9
+TERMUX_PKG_SHA256=f9cd9ec1b6a4111467cba31a7eed50ee5f03846fb1f5c32b3abdbf68877f8a4e
 TERMUX_PKG_DEPENDS="qt6-qtbase"
 TERMUX_PKG_BUILD_DEPENDS="extra-cmake-modules (>= ${TERMUX_PKG_VERSION}), python-lxml, qt6-qtbase-cross-tools"
 TERMUX_PKG_AUTO_UPDATE=true
@@ -39,7 +40,7 @@ termux_step_host_build() {
 	install(TARGETS qrcAlias DESTINATION bin)
 	install(TARGETS generate-symbolic-dark DESTINATION bin)
 	EOF
-	
+
 	mkdir -p build
 	cmake -B build \
 		-DCMAKE_BUILD_TYPE=MinSizeRel \

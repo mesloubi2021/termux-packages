@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://github.com/kcleal/gw
 TERMUX_PKG_DESCRIPTION="A browser for genomic sequencing data (.bam/.cram format)"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="clealk@cardiff.ac.uk"
-TERMUX_PKG_VERSION="1.1.1"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="1.1.4"
 TERMUX_PKG_SRCURL=https://github.com/kcleal/gw/archive/v${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=5ac0430d9179d1a48938f24011c329fe807e72aba0c20eb191c566d129115f86
+TERMUX_PKG_SHA256=ceb439bdd699810d2b2b0e265c10956045a758de4e96c3a47149f83fc451b1cd
 TERMUX_PKG_DEPENDS="glfw, htslib, libc++, libjpeg-turbo, opengl, libcurl"
 TERMUX_PKG_BUILD_DEPENDS="fontconfig, freetype, libicu, libuuid, mesa-dev, libcurl"
 TERMUX_PKG_AUTO_UPDATE=true
@@ -55,7 +54,7 @@ termux_step_make() {
 	unzip -o "${TERMUX_PKG_CACHEDIR}/skia-${TERMUX_ARCH}.zip"
 	cd ../../
 
-	make -j "$TERMUX_PKG_MAKE_PROCESSES"
+	OLD_SKIA=1 make -j "$TERMUX_PKG_MAKE_PROCESSES"
 }
 
 termux_step_make_install() {

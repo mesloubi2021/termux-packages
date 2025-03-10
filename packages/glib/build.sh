@@ -2,9 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://developer.gnome.org/glib/
 TERMUX_PKG_DESCRIPTION="Library providing core building blocks for libraries and applications written in C"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="2.82.4"
+TERMUX_PKG_VERSION="2.84.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://download.gnome.org/sources/glib/${TERMUX_PKG_VERSION%.*}/glib-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=37dd0877fe964cd15e9a2710b044a1830fb1bd93652a6d0cb6b8b2dff187c709
+TERMUX_PKG_SHA256=f8823600cb85425e2815cfad82ea20fdaa538482ab74e7293d58b3f64a5aff6a
 TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_DEPENDS="libandroid-support, libffi, libiconv, pcre2, resolv-conf, zlib"
 TERMUX_PKG_BREAKS="glib-dev"
@@ -90,7 +91,7 @@ termux_step_pre_configure() {
 		mkdir -p "$TERMUX_PKG_BUILDDIR"
 		TERMUX_PKG_EXTRA_CONFIGURE_ARGS="${TERMUX_PKG_EXTRA_CONFIGURE_ARGS/"-Dintrospection=enabled"/"-Dintrospection=disabled"}"
 		termux_setup_gir
-		
+
 		cd "$TERMUX_PKG_BUILDDIR"
 		TERMUX_PREFIX="$_PREFIX" termux_step_configure
 		cd "$TERMUX_PKG_BUILDDIR"
@@ -123,7 +124,7 @@ termux_step_pre_configure() {
 		cd "$TERMUX_PKG_BUILDDIR"
 		termux_step_make_install
 	)
-	
+
 	# Place the GIR files inside the root of the GIR directory (gir/.) of the package
 	termux_setup_gir
 

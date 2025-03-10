@@ -10,10 +10,9 @@ TERMUX_PKG_CONFLICTS="vim-gtk"
 TERMUX_PKG_BREAKS="vim-python, vim-runtime"
 TERMUX_PKG_REPLACES="vim-python, vim-runtime"
 TERMUX_PKG_PROVIDES="vim-python"
-TERMUX_PKG_VERSION="9.1.0950"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="9.1.1182"
 TERMUX_PKG_SRCURL="https://github.com/vim/vim/archive/v${TERMUX_PKG_VERSION}.tar.gz"
-TERMUX_PKG_SHA256=ff31083fdbdde49a1cd6e95ac751f194d75065d79c8d07d138a9c1afe3494b31
+TERMUX_PKG_SHA256=76e70ba07d9c0e9583ac78079fd7bf5392fa259b3b7a3030cc2d4ea0b96e8744
 TERMUX_PKG_ON_DEVICE_BUILD_NOT_SUPPORTED=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_CONFFILES="share/vim/vimrc"
@@ -62,9 +61,9 @@ TERMUX_PKG_AUTO_UPDATE=true
 TERMUX_PKG_UPDATE_VERSION_REGEXP='\d+\.\d+\.\d{2}(5|0)0'
 
 termux_pkg_auto_update() {
-	# This auto_update function is shared by `vim`, `vim-python` and `vim-gtk`
+	# This auto_update function is shared by `vim` and `vim-gtk`
 	# If you make changes to one of them,
-	# remember to apply that change to the other two as well.
+	# remember to apply that change to the other as well.
 	local release
 	release="$(git ls-remote --tags https://github.com/vim/vim.git \
 	| grep -oP "refs/tags/v\K${TERMUX_PKG_UPDATE_VERSION_REGEXP}$" \
